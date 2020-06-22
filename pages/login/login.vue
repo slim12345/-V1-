@@ -8,7 +8,7 @@
 		</view>
 		<view class="reg_head zc">
 			<image src="/static/login_02.png"></image>
-			<view class="load">
+			<view class="load" @click="downloadapp">
 				下载APP
 			</view>
 		</view>
@@ -30,13 +30,13 @@
 					<view class="icon">
 						<image class="icon02" src="/static/login_05.png" mode="aspectFill"></image>
 					</view>
-					<input class="text text02" v-model="emailphone" type="text" placeholder="请输入您的手机号或者邮箱号" placeholder-class="CCC"/>
+					<input class="text text02" v-model="emailphone" type="text" placeholder="请输入您的手机号或者邮箱号" placeholder-class="CCC" />
 				</view>
 				<view class="area">
 					<view class="icon">
 						<image class="icon02" src="/static/login_07.png" mode="aspectFill"></image>
 					</view>
-					<input class="text text02" v-model="pwd" password="true" placeholder="请输入您的密码" placeholder-class="CCC"/>
+					<input class="text text02" v-model="pwd" password="true" placeholder="请输入您的密码" placeholder-class="CCC" />
 				</view>
 				<button class="btn" style="margin-top: 90rpx;" form-type="submit">登录</button>
 				<view class="read">
@@ -57,6 +57,12 @@
 				pwd: ''
 			}
 		},
+		// #ifdef APP-PLUS
+		onBackPress(){
+		// 监听页面返回，自动关闭小键盘
+		plus.key.hideSoftKeybord();
+		},
+		// #endif
 		methods: {
 			// login(e){
 			// 	 uni.navigateTo({
@@ -96,17 +102,20 @@
 					}, complete);
 				});
 			},
+			//下载APP
+			downloadapp() {
+				// #ifdef  H5
+				var appURl = getApp().globalData.global_url + '/download/index.html';
+				location = appURl;
+				// #endif
+			},
 			// 跳转注册
 			zc(e) {
-				uni.navigateTo({
-					url: '../register/register'
-				})
+				this.To('/pages/register/register')
 			},
 			// 跳转忘记密码
 			wjpwd(e) {
-				uni.navigateTo({
-					url: '../forgetpassword/forgetpassword'
-				})
+				this.To('/pages/forgetpassword/forgetpassword')
 			},
 			// 返回上一页
 			back() {

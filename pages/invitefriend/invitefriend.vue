@@ -36,14 +36,17 @@
 				</view> -->
 			</view>
 		</view>
+		<!-- #ifdef APP-PLUS -->
 		<view class="save" @click="saveimg">
 			<image src="/static/load.png"></image>
 			<text>保存图片到本地</text>
 		</view>
+		<!-- #endif -->
 	</view>
 </template>
 
 <script>
+	import h5Copy from '@/js_sdk/junyi-h5-copy/junyi-h5-copy/junyi-h5-copy.js'
 	export default {
 		data() {
 			return {
@@ -65,18 +68,27 @@
 						that.url = res.url;
 					});
 			},
+
 			fuzhi(val) {
+				var that = this;
 				console.log(val);
+				// #ifndef H5
 				uni.setClipboardData({
 					data: val,
 					success() {
-						uni.showToast({
-							title: '复制成功',
-							duration: 2000,
-							icon: "none"
-						})
+						that.util.msg('复制成功');
 					}
 				})
+				// #endif
+				// #ifdef H5
+				let content = val ;// 复制内容，必须字符串，数字需要转换为字符串
+				const result = h5Copy(content)
+				if (result === false) {
+					that.util.msg('复制失败');
+				} else {
+					that.util.msg('复制成功');
+				}
+				// #endif
 			},
 			saveimg(e) {
 				uni.downloadFile({

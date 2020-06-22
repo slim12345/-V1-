@@ -25,6 +25,10 @@
 		onPullDownRefresh() {
 			this.loadData();
 		},
+		onBackPress(){
+		// 监听页面返回，自动关闭小键盘
+		plus.key.hideSoftKeybord();
+		},
 		methods: {
 			// 获取文章类型
 			loadData() {

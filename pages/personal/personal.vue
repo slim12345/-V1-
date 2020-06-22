@@ -4,7 +4,7 @@
 		<!-- 头像-开始 -->
 		<view class="user_bg">
 			<image src="/static/user_01.png" @click="mydata"></image>
-			<view class="user_img" @click="mydata"">
+			<view class="user_img" @click="mydata">
 				<image :src=" coverPath" mode="aspectFill">
 				</image>
 			</view>
@@ -22,7 +22,7 @@
 			<view class="user_jt" @click="mydata">
 				<image src="/static/user_04.png"></image>
 			</view>
-			<view class="user_id">
+			<view class="user_id" v-if="id">
 				ID：{{id}}
 			</view>
 			<view class="user_msg">
@@ -30,7 +30,7 @@
 					<text class="money">{{money}}</text>
 					<text class="unit">余额(元)</text>
 				</view>
-				<view class="msg_item" @click="invite">
+				<view class="msg_item">
 					<text class="money">{{countInvite}}</text>
 					<text class="unit">邀请人数</text>
 				</view>
@@ -73,9 +73,9 @@
 				<text>系统设置</text>
 				<image class="nav-jt" src="/static/icon_more.png"></image>
 			</view>
-			<view class="nav-item borderbom" @click="invfriend">
+			<view class="nav-item borderbom" @click="invite">
 				<image class="nav-image" src="/static/user_11.png"></image>
-				<text>邀请好友</text>
+				<text>邀请中心</text>
 				<image class="nav-jt" src="/static/icon_more.png"></image>
 			</view>
 			<view class="nav-item borderbom" @click="notice">
@@ -100,9 +100,9 @@
 				id: 0, //id
 				member_level: 0, //等级
 				mobile: 0,
-				nickname: '',
-				money: '',
-				countInvite: 0,
+				nickname: '登录/注册',
+				money: '--',
+				countInvite: '--',
 				isload: false
 			}
 		},
@@ -122,6 +122,12 @@
 		onPullDownRefresh() {
 			this.loadData();
 		},
+		// #ifndef MP-WEIXIN
+		onBackPress(){
+		// 监听页面返回，自动关闭小键盘
+		plus.key.hideSoftKeybord();
+		},
+		// #endif
 		methods: {
 			// 跳转我的钱包
 			purse(e) {
@@ -152,13 +158,19 @@
 			},
 			// 跳转关于我们
 			about(e) {
-				uni.makePhoneCall({
-					phoneNumber: '18998987676' //仅为示例
-				});
+				var that = this;
+				var cate_id = 1;
+				that.api.getbooklist(
+				{
+					cate_id:cate_id
+				},
+					function(res) {
+						console.log(res)
+						that.To('../essay/essay?title='+res[0].title +'&id='+res[0].id)	
+					});
 			},
 			loadData() {
 				var that = this;
-
 				that.api.my(
 					function(res) {
 						console.log(res)
@@ -173,7 +185,7 @@
 					function() {
 						that.isload = true;
 						uni.stopPullDownRefresh();
-					});
+					},true);
 
 			}
 		}

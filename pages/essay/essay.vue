@@ -1,6 +1,6 @@
 <template>
-	<view>
-		    <rich-text :nodes="content"></rich-text>
+	<view class="content">
+		    <rich-text :nodes="content.replace(/\<img/gi, '<img style=max-width:100%;height:auto')"></rich-text>
 	</view>
 </template>
 
@@ -36,6 +36,9 @@
 	}
 </script>
 
-<style>
-
+<style> 
+   .content{
+	   width: 690rpx;
+	   margin: 30rpx;
+   }
 </style>

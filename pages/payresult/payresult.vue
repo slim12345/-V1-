@@ -5,7 +5,8 @@
 				  <text class="state">支付失败</text>
 				  <text class="remind">失败了~请重新支付</text>
 			</view>
-			<view class="pay_btn" @click="goindex">返回首页</view>
+			<navigator url="/pages/index/index" open-type="switchTab" class="pay_btn">返回首页</navigator>
+			<!-- <view class="pay_btn" @click="goindex">返回首页</view> -->
 	</view>
 </template>
 
@@ -18,8 +19,9 @@
 		},
 		methods: {
 			 goindex(e){
+				 console.log(e)
 				 uni.redirectTo({
-				 	url:'../index/index'
+				 	url:'pages/index/index'
 				 })
 			 }
 		}

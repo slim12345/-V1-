@@ -29,19 +29,29 @@
 				duration: 500, //滑动动画时长
 				isToken: true,
 				banner: [],
-				isReg:true
+				isReg: true,
+				title: 'Hello'
 			}
 		},
-		onLoad() {
-
+		onLoad(options) {
+			this.loadData();
 		},
 		onShow() {
 			this.isWxLogin();
-			this.loadData();
+		},
+		onReady() {
+			this.getVersion();
 		},
 		onPullDownRefresh() {
 			this.loadData();
 		},
+		onShareAppMessage: function() {},
+		// #ifndef MP-WEIXIN
+		onBackPress() {
+			// 监听页面返回，自动关闭小键盘
+			plus.key.hideSoftKeybord();
+		},
+		// #endif
 		methods: {
 			// reg(){
 			// 	var that = this;
@@ -65,20 +75,19 @@
 						var iv = e.detail.iv;
 						that.api.wxsmaillogin(encryptedData, iv, function(res) {
 							that.isWxLogin();
-						  that.isReg = res.isReg;
-						  console.log(res)
-							if(res.isReg){
+							that.isReg = res.isReged;
+							console.log(res)
+							if (res.isReged) {
 								uni.switchTab({
-									url:'/pages/personal/personal'
+									url: '/pages/personal/personal'
 								})
-							}else{
+							} else {
 								uni.navigateTo({
-									url:'/pages/userbind/userbind'
+									url: '/pages/userbind/userbind'
 								})
 							}
 						}, complete);
 					} else {
-						
 						complete();
 					}
 				});
@@ -86,9 +95,9 @@
 			isWxLogin() {
 				var token = uni.getStorageSync('token');
 				if (token != undefined && token != '' && token != null) {
-					if(this.isReg){
+					if (this.isReg) {
 						this.isToken = false;
-					}else{
+					} else {
 						this.isToken = true;
 					}
 				} else {
@@ -114,12 +123,98 @@
 				// // #endif
 				var cate_id = 1;
 				that.api.index({
-					cate_id: cate_id
-				},
+						cate_id: cate_id
+					},
 					function(res) {
-						console.log(res)
+						// console.log(res)
 						that.banner = res;
 					});
+			},
+			getVersion() {
+				var that = this;
+				// #ifdef APP-PLUS
+				that.api.getversion(function(res) {
+					console.log(res);
+					//当前版本
+					var banben = plus.runtime.version;
+
+					if (uni.getSystemInfoSync().platform == 'android') {
+						//安卓信息
+						var android_download = res.ANDROID_LINK.value;
+						var apibanben = res.ANDROID_VERSION.value;
+						var android_updatecnt = res.ANDROID_DESC.value;
+						var androidIshave = res.ANDROID_IS_HAVE.value;
+
+						if (apibanben != banben) {
+							var buttons = [];
+							if (androidIshave == "0") {
+								buttons = ['立即更新', '暂不更新'];
+							} else {
+								buttons = ['立即更新'];
+							}
+							var isCancel = androidIshave == "0";
+							plus.nativeUI.confirm(android_updatecnt, function(e) {
+								console.log("Close confirm: " + e.index);
+								if (e.index == 0) {
+									var dtask = plus.downloader.createDownload(android_download, {}, function(s, status) {
+										// 下载完成
+										if (status == 200) {
+											plus.runtime.install(plus.io.convertLocalFileSystemURL(s.filename), {}, function(widgetInfo) {
+												console.log(widgetInfo);
+											}, function(error) {
+												that.util.msg('安装失败');
+											});
+										} else {
+											that.util.msg('下载失败');
+										}
+									});
+									//dtask.addEventListener("statechanged", onStateChanged, false);
+									dtask.start();
+									var Waiting = plus.nativeUI.showWaiting('下载进度0%', {
+										padding:'4%'
+									});
+
+									dtask.addEventListener('statechanged', function(
+										task,
+										status 
+									) {
+										//console.log(task,status);
+										switch (task.state) {
+											case 1:
+												break;
+											case 2:
+												break;
+											case 3:
+												var pro = parseInt(task.downloadedSize / task.totalSize * 100);
+												//console.log(pro)
+												Waiting.setTitle('下载进度' + pro + '%');
+												break;
+											case 4:
+												Waiting.close();
+												//下载完成
+												break;
+										}
+									});
+								}
+							}, {
+								'title': 'APP更新',
+								'buttons': buttons,
+								'verticalAlign': 'center'
+							});
+						}
+					}
+
+
+					//ios信息
+					var ios_download = res.IOS_LINK.value;
+					var apibanben01 = res.IOS_VERSION.value;
+					var ios_updatecnt = res.IOS_DESC.value;
+					var iosIshave = res.IOS_IS_HAVE.value;
+
+
+
+				});
+				// #endif
 			}
 		}
 	}

@@ -50,6 +50,7 @@
 					<text class="textstyle01">账号管理</text>
 				</view>
 			</view>
+			<!-- #ifdef APP-PLUS -->
 			<view class="mylist">
 				<view class="listcnt">
 					<text class="textstyle">微信</text>
@@ -59,13 +60,14 @@
 					</view>
 				</view>
 			</view>
+			<!-- #endif -->
 			<!-- 修改手机 -->
 			<view class="mylist">
 				<view class="listcnt" @click="updatephone">
 					<text class="textstyle">手机</text>
 					<view class="cnt">
-						<text v-if="isdisplayMobile" class="textstyle black">更换</text>
-						<text v-else  class="textstyle gray">未绑定</text>
+						<text v-if="isdisplayMobile" class="textstyle black">{{mobile}}</text>
+						<text v-else class="textstyle gray">未绑定</text>
 						<image class="nav-jt" src="/static/icon_more.png"></image>
 					</view>
 				</view>
@@ -75,14 +77,14 @@
 				<view class="listcnt" @click="updatemail">
 					<text class="textstyle">邮箱</text>
 					<view class="cnt">
-						<text v-if="isdisplayEmail"  class="textstyle black">更换</text>
+						<text v-if="isdisplayEmail" class="textstyle black">{{email}}</text>
 						<text v-else class="textstyle gray">未绑定</text>
 						<image class="nav-jt" src="/static/icon_more.png"></image>
 					</view>
 				</view>
 			</view>
 		</view>
-		<view class="data_bottom" @click="exit_login" v-if="isexit">
+		<view class="data_bottom" @click="exitlogin" v-if="isexit">
 			<text>退出登录</text>
 		</view>
 	</view>
@@ -102,10 +104,11 @@
 				userimg: '/static/user_14.png',
 				nickname: '哈哈哈',
 				mobile: 0,
+				email: '',
 				isexit: false,
 				isload: false,
-				isdisplayMobile:true,
-				isdisplayEmail:false
+				isdisplayMobile: false,
+				isdisplayEmail: false
 			}
 		},
 		computed: {
@@ -130,7 +133,7 @@
 			if (!isload) {
 				this.loadData();
 			}
-			
+
 		},
 		onShow() {
 			var isload = this.isload;
@@ -138,6 +141,12 @@
 				this.loadData();
 			}
 		},
+		// #ifndef MP-WEIXIN
+		onBackPress() {
+			// 监听页面返回，自动关闭小键盘
+			plus.key.hideSoftKeybord();
+		},
+		// #endif
 		methods: {
 			photo(e) {
 				var that = this;
@@ -169,22 +178,32 @@
 					}
 				});
 			},
-			exit_login() {
-				this.api.coderesult(-1, '退出成功');
+			exitlogin() {
+				var that = this;
+				uni.showModal({
+					content: '请确定是否退出登录',
+					success: function(res) {
+						if (res.confirm) {
+							that.api.coderesult(-1, '退出成功');
+						}
+					}
+				});
 			},
 			updatename(e) {
-				this.To('../updatename/updatename?name=' +this.nickname);
+				this.To('../updatename/updatename?name=' + this.nickname);
 			},
 			updatephone(e) {
 				var mobile = this.mobile;
 				console.log(mobile);
-				this.To('../updatephone/updatephone');
+				this.To('../updatephone/updatephone?mobile=' +mobile);
+				
 				// uni.navigateTo({
 				// 	url: '?mobile=' + mobile
 				// })
 			},
 			updatemail(e) {
-				this.To('../updatemail/updatemail');
+				var email = this.email;
+				this.To('../updatemail/updatemail?email='+email);
 			},
 			bindPickerChange: function(e) {
 				// console.log('picker发送选择改变，携带值为', e.target.value)
@@ -231,13 +250,14 @@
 				that.api.my(
 					function(res) {
 						console.log(res)
-						if(res.email!=null && res.email!=''&&res.email!=undefined){
-							that.isdisplayEmail = false
+						if (res.email != null && res.email != '' && res.email != undefined) {
+							that.isdisplayEmail = true
 						}
-						if(res.mobile!=null && res.mobile!=''&&res.mobile!=undefined){
+						if (res.mobile != null && res.mobile != '' && res.mobile != undefined) {
 							that.isdisplayMobile = true
 						}
 						that.userimg = res.coverPath;
+						that.email = res.email;
 						that.index = res.sex;
 						that.mobile = res.mobile;
 						that.nickname = res.nickname;
@@ -253,7 +273,8 @@
 						// var D = '0' + date.getDate();
 						// var timer = Y + M + D;
 						that.date = timer;
-					},function(){
+					},
+					function() {
 						that.isload = true;
 					});
 			}

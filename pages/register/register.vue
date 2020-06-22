@@ -8,7 +8,7 @@
 				<image class="head_icon" src="/static/login_01.png" mode="widthFix"></image>
 				<view class="reg_head zc">
 					<image src="/static/login_02.png"></image>
-					<view class="load">
+					<view class="load" @click="downloadapp">
 						下载APP
 					</view>
 				</view>
@@ -73,37 +73,37 @@
 						<view class="icon">
 							<image class="icon02" src="/static/login_05.png" mode="aspectFill"></image>
 						</view>
-						<input class="text text02" v-model="mobile" name="mobile" type="number" placeholder="请输入手机号" placeholder-class="CCC"/>
+						<input class="text text02" v-model="mobile" name="mobile" type="number" placeholder="请输入手机号" placeholder-class="CCC" />
 					</view>
 					<view class="area" v-if="currentTab==2">
 						<view class="icon">
 							<image class="icon02" src="/static/login_16.png" mode="aspectFill"></image>
 						</view>
-						<input class="text text02" v-model="email" name="email" type="text" placeholder="请输入邮箱号" placeholder-class="CCC"/>
+						<input class="text text02" v-model="email" name="email" type="text" placeholder="请输入邮箱号" placeholder-class="CCC" />
 					</view>
 					<view class="area">
 						<view class="icon">
 							<image class="icon03" src="/static/login_06.png" mode="aspectFill"></image>
 						</view>
-						<input class="text text03" name="code" type="number" placeholder="请输入验证码" placeholder-class="CCC"/>
+						<input class="text text03" name="code" type="number" placeholder="请输入验证码" placeholder-class="CCC" />
 						<view class="getcode" @click="getCode">{{sendText}}</view>
 					</view>
 					<view class="area">
 						<view class="icon">
 							<image class="icon04" src="/static/login_07.png" mode="aspectFill"></image>
 						</view>
-						<input class="text text02" password="true" name="password" placeholder="请设置您的密码" placeholder-class="CCC"/>
+						<input class="text text02" password="true" name="password" placeholder="请设置您的密码" placeholder-class="CCC" />
 					</view>
 					<view class="area">
 						<view class="icon">
 							<image class="icon05" src="/static/login_08.png" mode="aspectFill"></image>
 						</view>
-						<input class="text text02" name="invitation" placeholder="请输入您的邀请码" placeholder-class="CCC"/>
+						<input class="text text02" v-model="invitation" name="invitation" placeholder="请输入您的邀请码" placeholder-class="CCC" />
 					</view>
 
 					<button class="btn" style="margin-top: 90rpx;" form-type="submit">注册</button>
 					<view class="read">
-						点击注册即代表您同意<text class="blue">《用户协议》</text>
+						点击注册即代表您同意<text class="blue" @click="user_xy">《用户协议》</text>
 						<text class="right" @click="pwdlogin">密码登录</text>
 					</view>
 				</view>
@@ -123,29 +123,61 @@
 				sendText: '获取验证码',
 				currentTime: 60,
 				email: "",
+				invitation:'',
 				reslist: [],
 				range: [{
 					key: '86',
 					value: '中国 +86'
-				} ],
+				}],
 				index: 0,
 				global_url: getApp().globalData.global_url
 			}
 		},
-		onLoad() {
+		onLoad(options) {
 			var that = this;
-			that.loadData(that)
+			console.log(options)
+			if(options.invite_code!=undefined&&options.invite_code!=null&&options.invite_code!=''){
+				that.invitation = options.invite_code;
+			}
+			// that.loadData(that);
+		
 		},
+		// #ifndef MP-WEIXIN
+		onBackPress(){
+		// 监听页面返回，自动关闭小键盘
+		plus.key.hideSoftKeybord();
+		},
+		// #endif
 		methods: {
-			loadData(that) {
+			// loadData(that) {
+			// 	var that = this;
+			// 	var type = that.$data.currentTab;
+			// 	that.api.Getregister({
+			// 		type: type
+			// 	}, function(res) {
+			// 		console.log(res);
+			// 		that.$data.reslist = res;
+			// 	});
+			// },
+			//跳转用户协议
+			user_xy(){
 				var that = this;
-				var type = that.$data.currentTab;
-				that.api.Getregister({
-					type: type
-				}, function(res) {
-					console.log(res);
-					that.$data.reslist = res;
-				});
+				var cate_id = 1;
+				that.api.getbooklist(
+				{
+					cate_id:cate_id
+				},
+					function(res) {
+						console.log(res)
+						that.To('../essay/essay?title='+res[2].title +'&id='+res[2].id)	
+					});
+			},
+			//下载APP
+			downloadapp() {
+				// #ifdef  H5
+				var appURl = getApp().globalData.global_url + '/download/index.html';
+				location = appURl;
+				// #endif
 			},
 			// 获取手机验证码
 			getCode() {
@@ -284,9 +316,13 @@
 					that.api.Postregister(
 						data,
 						function(res) {
-							uni.redirectTo({
-								url: '../login/login'
-							})
+							that.util.msg('注册成功，请登录');
+							setTimeout(function(){
+								uni.redirectTo({
+									url: '../login/login'
+								})
+							},1500);
+							
 						}, complete);
 				})
 			},
@@ -294,25 +330,21 @@
 				var that = this;
 				console.log(e)
 				if (this.$data.currentTab === e.target.dataset.current) {
-					that.loadData(that)
+					// that.loadData(that)
 					return false;
 				} else {
 					that.$data.currentTab = e.target.dataset.current
-					that.loadData(that)
+					// that.loadData(that)
 				}
 			},
 			bindPickerChange: function(e) {
 				this.index = e.target.value
 			},
 			pwdlogin(e) {
-				uni.navigateTo({
-					url: '../login/login'
-				})
+				this.redirect('/pages/login/login');
 			},
 			back() {
-				uni.navigateBack({
-
-				})
+				uni.navigateBack({})
 			}
 
 		}

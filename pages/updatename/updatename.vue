@@ -18,6 +18,12 @@
 			var name = options.name;
 			this.nickname = name;
 		},
+		// #ifndef MP-WEIXIN
+		onBackPress(){
+		// 监听页面返回，自动关闭小键盘
+		plus.key.hideSoftKeybord();
+		},
+		// #endif
 		methods: {
 			save() {
 				var that = this;

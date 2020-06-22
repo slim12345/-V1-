@@ -6,10 +6,11 @@
 				<view class="txmoney"><text>提现金额</text></view>
 				<view class="input">
 					<text>￥</text>
-					<input type="number" name="money" placeholder="最低100元起提现" placeholder-style="color:#CCCCCC;" />
+					<input type="number" v-model="money" name="money" :placeholder="'最低' +limit_min+'元起提现'" placeholder-style="color:#CCCCCC;"
+					 @input="onInput" />
 				</view>
 				<view class="viewinput"></view>
-				<view class="ts">*目前可提现1600元（扣除**元手续费，费率3%）</view>
+				<view class="ts">*每笔最高提现{{limit_max}}元（扣除{{kouchu}}元手续费，费率{{rate}}%）</view>
 			</view>
 			<!-- 提现到账方式 -->
 			<view class="tixian_type">
@@ -95,10 +96,59 @@
 				currentTab: 1,
 				show: false,
 				title: '',
-				content: ''
+				content: '',
+				limit_min: 0,
+				limit_max: 0,
+				rate: '',
+				kouchu: 0,
+				money: 0
 			}
 		},
+		onLoad() {
+			var that = this;
+			that.api.tianxianfee({}, function(res) {
+				console.log(res)
+				var kouchu = (res.limit_min * res.rate / 100).toFixed(2);
+				that.kouchu = kouchu;
+				that.limit_max = res.limit_max;
+				that.limit_min = res.limit_min;
+				that.money = res.limit_min;
+				that.rate = res.rate;
+			})
+		},
+		// #ifndef MP-WEIXIN
+		onBackPress() {
+			// 监听页面返回，自动关闭小键盘
+			plus.key.hideSoftKeybord();
+		},
+		// #endif
 		methods: {
+			onInput(e) {
+				var that = this;
+				var money = parseFloat(e.detail.value);
+				if (isNaN(money)) {
+					money = 0;
+				}
+				var min = this.limit_min;
+				var max = this.limit_max;
+				// if (money < min) {
+				// 	money = min;
+				// }
+				if (money > max) {
+					money = max;
+				}
+				var kouchu = (money * this.rate * 0.01).toFixed(2);
+				this.kouchu = kouchu;
+				setTimeout(function() {
+					if (money <= 0) {
+						that.money = '';
+					} else {
+						that.money = money;
+					}
+
+					console.log(that.money);
+				}, 100);
+			},
 			//提现接口提交
 			formSubmit(e) {
 				var that = this;
@@ -149,7 +199,7 @@
 			},
 			// 弹出层
 			tj(e) {
-				
+
 				this.title = '提现失败';
 				this.content = '你的微信未绑定，请前往设置绑定微信';
 				this.show = true;

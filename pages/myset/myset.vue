@@ -1,15 +1,19 @@
 <template>
 	<view>
 		<view class="all">
-			<view class="setlist"  v-for="item in list" :key="item.id" @click="userxx(item.id,item.title)">
-				<text>{{item.title}}</text>
-				<image class="nav-jt" src="/static/icon_more.png"></image>
-			</view>
-			<!-- <view class="setlist" @click="abount">
+			<view class="setlist" @click="about">
 				<text>关于我们</text>
 				<image class="nav-jt" src="/static/icon_more.png"></image>
-			</view> -->
+			</view>
+			<view class="setlist" @click="user_xy">
+				<text>用户协议</text>
+				<image class="nav-jt" src="/static/icon_more.png"></image>
+			</view>
 		</view>
+			<view class="bq_bottom">
+				<view><text>Copyright©2020</text></view>
+				<view><text style="margin-right: 10rpx;">敢想信息</text><text>版权所有</text></view>
+			</view>
 	</view>
 </template>
 
@@ -17,36 +21,43 @@
 	export default {
 		data() {
 			return {
-              list:[]
 			}
 		},
 		onLoad(){
 			this.loadData();
 		},
 		methods: {
-			// 获取文章类型
-			loadData(){
-			var that = this;
-			var cate_id = 1;
-			that.api.getbooklist(
-			{
-				cate_id:cate_id
-			},
-				function(res) {
-					console.log(res)
-					that.list = res;
-				});
-			},
-			// 跳转文章
-			userxx(id,title) {
-				this.To('../essay/essay?id=' + id +'&title=' +title);
-			},
-		   // 联系我们
-			lianxi(e) {
-				uni.makePhoneCall({
-				    phoneNumber: '18909090808' //仅为示例
-				});
-			}
+		  about(){
+			  var that = this;
+			  var cate_id = 1;
+			  that.api.getbooklist(
+			  {
+			  	cate_id:cate_id
+			  },
+			  	function(res) {
+			  		console.log(res)
+			  		that.To('../essay/essay?title='+res[1].title +'&id='+res[1].id)	
+			  	});
+		  },
+		  user_xy(){
+			  var that = this;
+			  var cate_id = 1;
+			  that.api.getbooklist(
+			  {
+			  	cate_id:cate_id
+			  },
+			  	function(res) {
+			  		console.log(res)
+			  		that.To('../essay/essay?title='+res[2].title +'&id='+res[2].id)	
+			  	});
+		  },
+		  loadData(){
+			  var that = this;
+			  that.api.getversion(function(res){
+				   console.log(res)
+			  })
+		  }
+			
 		}
 	}
 </script>
@@ -55,7 +66,17 @@
 	page {
 		background: #FAFAFA;
 	}
-
+.bq_bottom{
+	width: 100%;
+	position: fixed;
+	bottom: 100rpx;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	color: #999999;
+	font-size: 24rpx;
+}
 	.all {
 		width: 100%;
 		background: #FFFFFF;

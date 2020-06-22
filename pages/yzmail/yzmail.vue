@@ -3,8 +3,11 @@
 		
 		<view class="yzmail">
 		    <text>我们已向您的邮箱</text>
-			<text style="font-weight:bold;">458645213@qq.com </text>
+			<text style="font-weight:bold;">{{email}}</text>
 			<text>发送了一封邮件，请您注意接收邮件</text>
+		</view>
+		<view class="update  updatebottom">
+			<input type="number" v-model="yzm" placeholder="请输入验证码" placeholder-class="CCC"/>
 		</view>
 		 <view class="btn" @click="send">确认</view>
 	</view>
@@ -14,11 +17,37 @@
 	export default {
 		data() {
 			return {
-				
+				email:'',
+				yzm:''
 			}
 		},
+		onLoad(option) {
+			var email = option.email;
+			this.email = email;
+		},
+		// #ifndef MP-WEIXIN
+		onBackPress(){
+		// 监听页面返回，自动关闭小键盘
+		plus.key.hideSoftKeybord();
+		},
+		// #endif
 		methods: {
-			
+			send(){
+				var that = this;
+				var data = {};
+				data.type = 'email';
+				data.val = that.email;
+				data.code = that.yzm;
+				that.api.bindedit(
+					data,
+					function(res) {
+						uni.removeStorageSync('token');
+						uni.setStorageSync('token',res)
+						uni.redirectTo({
+							url:'/pages/mydata/mydata'
+						})
+					});
+			}
 		}
 	}
 </script>

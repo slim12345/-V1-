@@ -11,7 +11,7 @@
 			<view class="invite_data">
 				<view class="yqname">
 					<text>邀请数据</text>
-					<image src="/static/yqzx_02.png"></image>
+					<image @click="essay" src="/static/yqzx_02.png"></image>
 				</view>
 				<view class="allyq">
 					<text class="yqpeople">总邀请人数:{{subordinate_count}}</text>
@@ -33,7 +33,7 @@
 			</view>
 		</view>
 		<!-- 按钮 -->
-		<view class="tixian_bottom">
+		<view class="tixian_bottom" @click="invitepeople">
 			<view>点击邀请好友</view>
 		</view>
 	</view>
@@ -55,6 +55,7 @@
 		onLoad() {
 			this.loadData();
 			this.loadData1();
+			
 		},
 		onPullDownRefresh() {
 			this.loadData();
@@ -70,6 +71,21 @@
 			swiperClick(url, title) {
 				url = 'https://www.baidu.com';
 				this.To('/pages/web_url/web_url?url=' + encodeURIComponent(url) + '&title=' + title);
+			},
+			invitepeople(){
+				this.To('/pages/invitefriend/invitefriend');
+			},
+			essay(){
+				var that = this;
+				var cate_id = 4;
+				that.api.getbooklist(
+				{
+					cate_id:cate_id
+				},
+					function(res) {
+						console.log(res)
+						that.To('../essay/essay?title='+res[0].title +'&id='+res[0].id)	
+					});
 			},
 			// 邀请轮播
 			loadData() {
@@ -111,7 +127,8 @@
 						that.total_commission = res.data.total_commission;
 						that.sublist = res.data.subordinate_list;
 					});
-			}
+			},
+			
 		}
 	}
 </script>

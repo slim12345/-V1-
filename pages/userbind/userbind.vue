@@ -81,12 +81,21 @@ export default {
 					value: '中国 +87'
 				}],
 				index: 0,
-				global_url: getApp().globalData.global_url
+				global_url: getApp().globalData.global_url,
+				international:''
 			}
 		},
 		onLoad() {
 			var that = this;
+			that.international = that.range[that.index].value;
+			console.log(this.international);
 		},
+		// #ifndef MP-WEIXIN
+		onBackPress(){
+		// 监听页面返回，自动关闭小键盘
+		plus.key.hideSoftKeybord();
+		},
+		// #endif
 		methods: {
 			// 获取手机验证码
 			getCode() {
@@ -164,7 +173,7 @@ export default {
 				})
 
 			},
-			// 提交注册接口
+			// 提交接口
 			formSubmit(e) {
 				var that = this;
 				this.Click(function(complete) {
@@ -183,7 +192,8 @@ export default {
 							complete();
 							return;
 						}
-						data.mobile = mobile;
+						data.val = mobile;
+						data.type = 'mobile';
 					} else {
 						var email = e.detail.value.email;
 						if (email == '' && email == undefined) {
@@ -196,7 +206,8 @@ export default {
 							complete();
 							return;
 						}
-						data.email = email;
+						data.val = email;
+						data.type = 'email';
 					}
 					var code = e.detail.value.code;
 					if (code == '') {
@@ -209,14 +220,16 @@ export default {
 						complete();
 						return;
 					}
-					var invitation = e.detail.value.invitation;
+					var international = that.international;
 					data.code = code;
-					data.invitation = invitation;
+					data.international = international;
 					console.log(data);
-					that.api.Userbind(
+					that.api.bindedit(
 						data,
 						function(res) {
-							that.To('/pages/personal/personal');
+							uni.reLaunch({
+								url: '/pages/personal/personal'
+							})
 						}, complete);
 				})
 			},
@@ -233,6 +246,8 @@ export default {
 			},
 			bindPickerChange: function(e) {
 				this.index = e.target.value;
+				this.international = this.range[e.target.value].value;
+				console.log(this.international);
 			},
 			pwdlogin(e) {
 				uni.navigateTo({

@@ -19,7 +19,7 @@
 					<image v-else src="/static/login_14.png"></image>
 					<text>同意</text>
 				</view>
-				<view><text>《用户协议》</text></view>
+				<view @click="user_xy"><text>《用户协议》</text></view>
 			</view>
 		</view>
 	</view>
@@ -32,13 +32,17 @@
 				isSelect: true
 			}
 		},
+		// #ifndef MP-WEIXIN
+		onBackPress(){
+		// 监听页面返回，自动关闭小键盘
+		plus.key.hideSoftKeybord();
+		},
+		// #endif
 		methods: {
 			login() {
 				var isSelect = this.isSelect;
 				if(isSelect){
-					uni.navigateTo({
-						url: '../login/login'
-					})
+					this.To('/pages/login/login');
 				}else{
 					this.util.msg('请先同意《用户协议》')
 				}
@@ -47,9 +51,7 @@
 			zc() {
 				var isSelect = this.isSelect;
 				if(isSelect){
-					uni.navigateTo({
-						url: '../register/register'
-					})
+					this.To('/pages/register/register');
 				}else{
 					this.util.msg('请先同意《用户协议》')
 				}
@@ -62,7 +64,7 @@
 				var isSelect = that.isSelect;
 				if(isSelect){
 					that.api.wxapplogin(function(res) {
-						if(res.isReg){
+						if(res.isReged){
 							that.switchtab('/pages/index/index');
 						}else{
 							that.util.msg('请先绑定用户');
@@ -73,8 +75,19 @@
 				}else{
 					that.util.msg('请先同意《用户协议》')
 				}
-			
-				
+			},
+			//跳转用户协议
+			user_xy(){
+				var that = this;
+				var cate_id = 1;
+				that.api.getbooklist(
+				{
+					cate_id:cate_id
+				},
+					function(res) {
+						console.log(res)
+						that.To('../essay/essay?title='+res[2].title +'&id='+res[2].id)	
+					});
 			}
 		}
 	}

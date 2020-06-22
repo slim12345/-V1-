@@ -7,40 +7,48 @@
 				<text>我的钱包</text>
 			</view>
 			<!-- #endif -->
-			<image class="purse_bgimg" src="/static/money_01.png" mode="widthFix"></image>
+			<image class="purse_bgimg" src="/static/money_01.png" mode="aspectFill"></image>
 			<view class="zh_yue">
-				账户余额（￥）
+				账户余额（USDT）
 			</view>
 			<view class="money">
-				<text>{{money}}</text>
+				<text>*{{money}}</text>
 				<view class="yqzx" @click="pursedetail">
 					<image src="/static/money_02.png"></image>
 				</view>
 			</view>
 			<view class="profit">
-				<text>总收益：{{allEarning}}.00</text>
-				<text style="margin-left: 64rpx;">累计收益：{{allEarning}}.00</text>
+				<view class="left">
+					<text>可用数量</text>
+					<text>*{{allEarning}}</text>
+				</view>
+				<view class="right">
+					<text >冻结数量</text>
+					<text>*{{allEarning}}</text>
+				</view>
+				
 			</view>
 		</view>
 		<view class="money_type">
 			<view :class="'types '+(currentTab==0?'active':'')" @click="clickTab" data-current="0">全部</view>
-			<view :class="'types '+(currentTab==1?'active':'')" @click="clickTab" data-current="1">支出</view>
-			<view :class="'types '+(currentTab==2?'active':'')" @click="clickTab" data-current="2">收入</view>
+			<view :class="'types '+(currentTab==1?'active':'')" @click="clickTab" data-current="1">转入</view>
+			<view :class="'types '+(currentTab==2?'active':'')" @click="clickTab" data-current="2">转出</view>
 		</view>
 		<view class="all">
 			<view class="purselist" v-for="item in purselist" :key="item.id">
 				<view class="pay">
-					<text class="trade">{{item.remarks}}</text>
-					<text class="time">{{item.create_time}}</text>
+					<text class="trade">*{{item.remarks}}</text>
+					<text class="time">*{{item.create_time}}</text>
 				</view>
 				<view class="num">
-					<text class="number">{{item.symbol}}{{item.change}}</text>
+					<text class="number">*{{item.symbol}}{{item.change}}</text>
+					<text class="hasReturn">已返还账户</text>
 				</view>
 			</view>
 		</view>
 		<view class="purse_bottom">
-			<view class="tx" @click="tx"><text>提现</text></view>
-			<view class="cz" @click="cz"><text>充值</text></view>
+			<view class="tx" @click="tx"><text>转出</text></view>
+			<view class="cz" @click="cz"><text>转入</text></view>
 		</view>
 	</view>
 </template>
@@ -50,7 +58,7 @@
 		data() {
 			return {
 				currentTab: 0,
-				purselist: [],
+				purselist: [{}],
 				money: '',
 				allEarning: '',
 				page: 1,
@@ -58,12 +66,12 @@
 			}
 		},
 		onLoad() {
-			this.loadData();
-			this.loadData2();
+			// this.loadData();
+			// this.loadData2();
 		},
 		onPullDownRefresh() {
-			this.loadData();
-			this.loadData2();
+			// this.loadData();
+			// this.loadData2();
 			// uni.stopPullDownRefresh();
 		},
 		onReachBottom() {
@@ -71,12 +79,6 @@
 			this.page = index;
 			this.loadData();
 		},
-		// #ifndef MP-WEIXIN
-		onBackPress(){
-		// 监听页面返回，自动关闭小键盘
-		plus.key.hideSoftKeybord();
-		},
-		// #endif
 		methods: {
 			// 后退
 			back() {
@@ -86,14 +88,14 @@
 			//钱包富文本
 			pursedetail(){
 				var that = this;
-				var cate_id = 4;
+				var cate_id = 3;
 				that.api.getbooklist(
 				{
 					cate_id:cate_id
 				},
 					function(res) {
 						console.log(res)
-						that.To('../essay/essay?title='+res[1].title +'&id='+res[1].id)
+						that.To('../essay/essay?title='+res[0].title +'&id='+res[0].id)
 					});
 				
 			},
@@ -111,10 +113,10 @@
 				}
 			},
 			tx(e) {
-				this.To('../tixian/tixian');
+				this.To('../usdtzhuanchu/usdtzhuanchu');
 			},
 			cz(e) {
-				this.To('../chongzhi/chongzhi');
+				this.To('../usdtzhuanru/usdtzhuanru');
 			},
 			// 获取钱包列表记录
 			loadData() {
@@ -154,7 +156,7 @@
 	}
 </script>
 
-<style>
+<style lang="scss">
 	.purse_bg {
 		position: relative;
 	}
@@ -189,7 +191,8 @@
 	.zh_yue {
 		position: absolute;
 		top: 177rpx;
-		left: 30rpx;
+		left: 50%;
+		transform: translateX(-50%);
 		font-size: 24rpx;
 		font-family: PingFang SC;
 		font-weight: bold;
@@ -199,7 +202,8 @@
 	.money {
 		position: absolute;
 		top: 250rpx;
-		left: 33rpx;
+		left: 50%;
+		transform: translateX(-50%);
 		font-size: 68rpx;
 		font-family: PingFang SC;
 		font-weight: bold;
@@ -215,14 +219,33 @@
 	}
 
 	.profit {
+		margin-top:69rpx;
+		width:100%;
 		position: absolute;
-		top: 350rpx;
-		left: 30rpx;
+		top: 300rpx;
+		// left: 30rpx;
 		font-size: 24rpx;
 		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(255, 255, 255, 1);
+		.left,.right{
+			float: left;
+			text-align: center;
+			width:49%;
+			text{
+				display: block;
+			}
+		}
+		.right::before{
+			display: block;
+			float:left;
+			content:'|';
+			
+			transform: translateY(50%);
+			opacity: 0.6;
+		}
 	}
+	
 
 	.money_type {
 		width: 690rpx;
@@ -288,11 +311,21 @@
 		color: rgba(153, 153, 153, 1);
 		margin-top: 4rpx;
 	}
-
+	.num{
+		text-align: right;
+	}
 	.number {
+		
 		font-size: 32rpx;
 		font-family: PingFang SC;
 		font-weight: bold;
+	}
+	.hasReturn{
+		display: block;
+		font-size:26rpx;
+	
+		color:rgba(237,81,75,1);
+		line-height:32rpx;
 	}
 
 	.purse_bottom {
