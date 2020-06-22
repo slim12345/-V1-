@@ -70,7 +70,7 @@ function toMd5(requestData, timestamp, nonce) {
 	requestData['timestamp'] = timestamp;
 	requestData['key'] = key;
 	var data = dicOrderWithData(requestData);
-	console.log(data);
+	// console.log(data);
 	return md5.md5(data);
 }
 //排序处理成字符串

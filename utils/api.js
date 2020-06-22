@@ -2,6 +2,7 @@ import util from "@/utils/util.js";
 
 //处理code
 function coderesult(code, msg) {
+	console.log(code, msg)
 	if (code == -1) {
 		uni.removeStorageSync('token');
 		// #ifdef APP-PLUS
@@ -12,7 +13,10 @@ function coderesult(code, msg) {
 		// #ifdef H5
 		var ua = window.navigator.userAgent.toLowerCase();
 		if (ua.match(/micromessenger/i) == 'micromessenger') {
-			util.msg('登录已超时');
+			util.msg(msg);
+			// uni.reLaunch({
+			// 	url: '/pages/login/login'
+			// })
 		} else {
 			uni.reLaunch({
 				url: '/pages/login/login'
@@ -72,7 +76,8 @@ function Usertianxian(data, success, complete) {
 }
 //用户充值
 function Userchongzhi(data, success, complete) {
-	util.PostRequest('/index/recharge/index', data, function(res) {
+	util.PostRequest('/index/recharge/pay', data, function(res) {
+		console.log(data)
 		if (res.code == 1) {
 			if (success) {
 				success(res.data);
@@ -98,6 +103,7 @@ function Getregister(data, success, complete) {
 function Postregister(data, success, complete) {
 	util.PostRequest('/auth/auth/reg', data, function(res) {
 		if (res.code == 1) {
+			util.msg('注册成功，请登录');
 			if (success) {
 				success(res.data);
 			}
@@ -149,8 +155,7 @@ function wxsmaillogin(encryptedData, iv, success, complete) {
 			if (success) {
 				success(decres.data);
 			}
-			console.log(decres.data.isReg);
-			
+
 		} else {
 			coderesult(decres.code, decres.msg);
 		}
@@ -173,14 +178,20 @@ function index(data, success) {
 	}, false);
 }
 // 我的 获取用户信息
-function my(success, complete) {
-	util.GetRequest('/index/center/getuserinfo', '', function(res) {
+function my(success, complete, isGo = false) {
+	util.GetRequest('/index/center/getuserinfo', {}, function(res) {
+		console.log(res)
 		if (res.code == 1) {
 			if (success) {
 				success(res.data);
 			}
 		} else {
-			coderesult(res.code, res.msg);
+			// coderesult(res.code, res.msg);
+			if (isGo) {
+				util.msg('您还没有登录或注册哦')
+			} else {
+				coderesult(res.code, res.msg);
+			}
 		}
 	}, complete);
 }
@@ -200,6 +211,7 @@ function mypurse(data, success) {
 function updatephone(data, success) {
 	util.GetRequest('/index/center/editmobile', data, function(res) {
 		if (res.code == 1) {
+			util.msg(res.msg);
 			if (success) {
 				success(res.data);
 			}
@@ -297,9 +309,9 @@ function getbooklist(data, success) {
 		} else {
 			coderesult(res.code, res.msg);
 		}
-	},function() {
+	}, function() {
 		uni.stopPullDownRefresh();
-	},false);
+	}, false);
 }
 // 文章详情
 function getbookdetail(data, success) {
@@ -314,7 +326,7 @@ function getbookdetail(data, success) {
 	});
 }
 // 获取邀请列表
-function getMyInvitationList(data,success){
+function getMyInvitationList(data, success) {
 	util.GetRequest('/index/Invitation/getMyInvitationList', data, function(res) {
 		if (res.code == 1) {
 			if (success) {
@@ -323,12 +335,12 @@ function getMyInvitationList(data,success){
 		} else {
 			coderesult(res.code, res.msg);
 		}
-	},function() {
+	}, function() {
 		uni.stopPullDownRefresh();
 	}, false);
 }
 //邀请好友 获取海报
-function getInviteFriends(success){
+function getInviteFriends(success) {
 	util.GetRequest('/index/Invitation/getInviteFriends', '', function(res) {
 		if (res.code == 1) {
 			if (success) {
@@ -339,6 +351,61 @@ function getInviteFriends(success){
 		}
 	});
 }
+//获取版本控制信息
+function getversion(success) {
+	util.GetRequest('/other/index/getversion', {}, function(res) {
+		if (res.code == 1) {
+			if (success) {
+				success(res.data);
+			}
+		} else {
+			coderesult(res.code, res.msg);
+		}
+	});
+}
+//提现配置
+function tianxianfee(data, success, complete) {
+	util.PostRequest('/withdrawal/index/fee', data, function(res) {
+		if (res.code == 1) {
+			if (success) {
+				success(res.data);
+			}
+		} else {
+			coderesult(res.code, res.msg);
+		}
+
+	}, complete, false);
+}
+//忘记密码
+function forgetPassword(data,success,complete){
+	util.PostRequest('/auth/auth/forgetPassword', data, function(res) {
+		if (res.code == 1) {
+			util.msg(res.msg)
+			if (success) {
+				success(res.data);
+			}
+		} else {
+			coderesult(res.code, res.msg);
+		}
+	
+	}, complete, false);
+}
+// 绑定手机号 修改邮箱 绑定邮箱/auth/auth/bindedit
+function bindedit(data,success,complete){
+	util.PostRequest('/auth/auth/bindedit', data, function(res) {
+		if (res.code == 1) {
+			console.log(res)
+			util.msg('绑定成功')
+			if (success) {
+				success(res.data);
+			}
+		} else {
+			coderesult(res.code, res.msg);
+		}
+	
+	}, complete, false);
+}
+
 export default {
 	Getregister: Getregister,
 	Postregister: Postregister,
@@ -353,14 +420,17 @@ export default {
 	my: my,
 	mypurse: mypurse,
 	uploadimg: uploadimg,
-	uploadfile:uploadfile,
+	uploadfile: uploadfile,
 	updatedata: updatedata,
 	updatephone: updatephone,
 	wxapplogin: wxapplogin,
-	coderesult:coderesult,
-	getbooklist:getbooklist,
-	getbookdetail:getbookdetail,
-	getMyInvitationList:getMyInvitationList,
-	getInviteFriends:getInviteFriends
-
+	coderesult: coderesult,
+	getbooklist: getbooklist,
+	getbookdetail: getbookdetail,
+	getMyInvitationList: getMyInvitationList,
+	getInviteFriends: getInviteFriends,
+	getversion: getversion,
+	tianxianfee: tianxianfee,
+	forgetPassword:forgetPassword,
+	bindedit:bindedit
 }

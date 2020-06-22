@@ -111,10 +111,8 @@
 		}
 
 		, {
-			"path": "pages/updatephone/updatephone",
-			"style": {
-				"navigationBarTitleText": "修改手机号码"
-			}
+			"path": "pages/updatephone/updatephone"
+			
 		}, {
 			"path": "pages/updatemail/updatemail",
 			"style": {
@@ -147,12 +145,86 @@
 				}
 			}
 		}, {
-			"path": "pages/shengtai/shengtai",
-			"style": {}
+			"path": "pages/market/market",
+			"style": {
+				"navigationBarTitleText": "商城",
+				"enablePullDownRefresh": true
+			}
 		}, {
+			"path": "pages/goodsdetail/goodsdetail",
+			"style": {
+				"navigationBarTitleText": "商品详情",
+				"enablePullDownRefresh": true
+			}
+		},{
+			"path": "pages/cart/cart",
+			"style": {
+				"navigationBarTitleText": "购物车",
+				"enablePullDownRefresh": true
+			}
+		}, {
+			"path": "pages/order/createOrder",
+			"style": {
+				"navigationBarTitleText": "确认订单"
+			
+			}
+		}, {
+			"path": "pages/order/orderDetail",
+			"style": {
+				"navigationBarTitleText": "订单详情"
+			
+			}
+		},{
+			"path": "pages/order/order",
+			"style": {
+				"navigationBarTitleText": "我的订单"
+			
+			}
+		},{
+			"path": "pages/address/address",
+			"style": {
+				"navigationBarTitleText": "填写地址"
+			
+			}
+		},{
+			"path": "pages/address/addressManage",
+			"style": {
+				"navigationBarTitleText": "我的地址"
+			
+			}
+		},{
+			"path": "pages/money/pay",
+			"style": {
+				"navigationBarTitleText": "确定支付"
+			
+			}
+		},{
+			"path": "pages/payresult/paySuccess",
+			"style": {
+				"navigationBarTitleText": "支付结果"
+			
+			}
+		},{
 			"path": "pages/qianbao/qianbao",
-			"style": {}
+			"style": {
+				"navigationBarTitleText": "钱包"
+			}
 		}, {
+			"path": "pages/usdtaccount/usdtaccount",
+			"style": {
+				"navigationBarTitleText": "USDT"
+			}
+		},{
+			"path": "pages/usdtzhuanru/usdtzhuanru",
+			"style": {
+				"navigationBarTitleText": "转入"
+			}
+		},{
+			"path": "pages/usdtzhuanchu/usdtzhuanchu",
+			"style": {
+				"navigationBarTitleText": "转出"
+			}
+		},{
 			"path": "pages/userbind/userbind",
 			"style": {
 				"navigationBarTitleText": "请完成用户绑定"
@@ -187,10 +259,10 @@
 				"text": "钱包"
 			},
 			{
-				"pagePath": "pages/shengtai/shengtai",
-				"iconPath": "static/tab_icon_st_default.png",
-				"selectedIconPath": "static/tab_icon_st_selected.png",
-				"text": "生态"
+				"pagePath": "pages/market/market",
+				"iconPath": "static/shangdianorigin@2x.png",
+				"selectedIconPath": "static/shangdian@2x.png",
+				"text": "商城"
 			},
 			{
 				"pagePath": "pages/personal/personal",

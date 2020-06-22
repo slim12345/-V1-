@@ -1,5 +1,8 @@
 import Vue from 'vue'
 import App from './App'
+import store from './store'
+
+import Json from './Json' //测试用数据
 
 Vue.config.productionTip = false
 
@@ -83,11 +86,26 @@ import neilModal from '@/components/neil-modal/neil-modal.vue';
 Vue.component('neilModal', neilModal); //设置组件名称
 //结束
 
+
+const json = type=>{
+	//模拟异步请求数据
+	return new Promise(resolve=>{
+		setTimeout(()=>{
+			resolve(Json[type]);
+		}, 500)
+	})
+}
+
+
 //全局函数
 import api from '@/utils/api.js';
 import util from '@/utils/util.js';
+import h5Copy from '@/js_sdk/junyi-h5-copy/junyi-h5-copy/junyi-h5-copy.js'
 Vue.prototype.api = api;
 Vue.prototype.util = util;
+Vue.prototype.h5Copy=h5Copy;
+Vue.prototype.$store = store;
+Vue.prototype.$apiJson= {json};
 //结束
 
 

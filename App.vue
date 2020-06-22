@@ -23,6 +23,7 @@
 			}
 		},
 		onLaunch: function(options) {
+			var that = this;
 			// #ifdef APP-PLUS
 			switch (uni.getSystemInfoSync().platform) {
 				case 'android':
@@ -48,7 +49,7 @@
 				success: function(loginRes) {
 					console.log(loginRes);
 					uni.request({
-						url: that.globalData.global_url + '/auth/auth/getwxsmalluserinfo', 
+						url: that.globalData.global_url + '/auth/auth/getwxsmalluserinfo',
 						data: {
 							jscode: loginRes.code
 						},
@@ -85,36 +86,183 @@
 				}
 			})
 			// #endif
-
 			// #ifdef H5
-			// var ua = window.navigator.userAgent.toLowerCase();
-			// if (ua.match(/micromessenger/i) == 'micromessenger') {
-			// 	if (options.query.jwt && options.query.jwt != '') {
-			// 		var tempToken = options.query.jwt;
-			// 		uni.setStorageSync('token', tempToken);
-			// 		console.log(tempToken);
-			// 	} else if (token == undefined || token == '' || token == null) {
-			// 		var pid = '';
-			// 		if (options.query.pid) {
-			// 			pid = options.query.pid;
-			// 		}
-			// 		var path = '';
-			// 		if (options.path) {
-			// 			path = options.path;
-			// 		}
-			// 		var to_url = that.globalData.global_url + that.globalData.site + path;
-			// 		var url = that.globalData.global_url +
-			// 			'/auth/auth/wxpubliclogin?to_url=' + encodeURIComponent(to_url) +
-			// 			'&pid=' + pid;
-			// 		//console.log(url);
-			// 		location.replace(url);
-			// 	}
-			// } else {
-			//	// that.globalData.msg('请在微信中打开！');
-			// }
-			// #endif
+			var ua = window.navigator.userAgent.toLowerCase();
+			if (ua.match(/micromessenger/i) == 'micromessenger') {
+				if (options.query.jwt && options.query.jwt != '') {
+					var tempToken = options.query.jwt;
+					uni.setStorageSync('token', tempToken);
+					console.log(tempToken);
+					var isReged = options.query.isReged;
+					if (isReged != '1') {
+						uni.reLaunch({
+							url: '/pages/userbind/userbind'
+						})
+					}
+				} else {
+					// if (token == undefined || token == '' || token == null) {
+					var pid = '';
+					if (options.query.pid) {
+						pid = options.query.pid;
+					}
+					var path = '';
+					if (options.path) {
+						path = options.path;
+					}
+					var to_url = that.globalData.global_url + that.globalData.site + path;
+					var url = that.globalData.global_url +
+						'/auth/auth/wxpubliclogin?to_url=' + encodeURIComponent(to_url) +
+						'&pid=' + pid ;
+					if(path!='pages/register/register'){
+						location.replace(url);
+					}
 
+				}
+			} else {
+				// that.globalData.msg('请在微信中打开！');
+			}
+			// #endif
 			// #ifdef APP-PLUS
+			// uni.request({
+			// 	url: that.globalData.global_url + '/other/index/getversion',
+			// 	data: {},
+			// 	method: 'GET',
+			// 	success: function(res) {
+			// 		//console.log(res);
+			// 		if (res && res.statusCode == 200) {
+			// 			var data = res.data;
+			// 			console.log(data);
+			// 			if (data.code == 1) {
+			// 				var d = data.data;
+			// 				var banben = plus.runtime.version;
+			// 				if (uni.getSystemInfoSync().platform == 'android') {
+			// 					var android_download = d.ANDROID_LINK.value;
+			// 					var apibanben = d.ANDROID_VERSION.value;
+			// 					var android_updatecnt = d.ANDROID_DESC.value;
+			// 					var androidIshave = d.ANDROID_IS_HAVE.value;
+			// 					if (apibanben != banben) {
+			// 						if (androidIshave == "0") {
+			// 							uni.showModal({
+			// 								title: '版本更新',
+			// 								content: android_updatecnt,
+			// 								confirmText: '立即更新',
+			// 								cancelText: '暂不更新',
+			// 								success: function(res) {
+			// 									if (res.confirm) {
+			// 										var dtask = plus.downloader.createDownload(android_download, {}, function(s, status) {
+			// 											// 下载完成
+			// 											if (status == 200) {
+			// 												console.log("Download success: " + s.filename);
+			// 												plus.runtime.install(plus.io.convertLocalFileSystemURL(s.filename), {}, function(widgetInfo) {
+			// 													console.log(widgetInfo)
+			// 												}, function(error) {
+			// 													console.log(error)
+			// 												});
+			// 											} else {
+			// 												that.globalData.msg('下载失败');
+			// 											}
+			// 										});
+			// 										//dtask.addEventListener("statechanged", onStateChanged, false);
+			// 										dtask.start();
+			// 									}
+			// 								}
+			// 							});
+			// 						} else {
+			// 							uni.showModal({
+			// 								title: '版本更新',
+			// 								content: android_updatecnt,
+			// 								confirmText: '立即更新',
+			// 								showCancel: false,
+			// 								success: function(res) {
+			// 									if (res.confirm) {
+			// 											var dtask = plus.downloader.createDownload(android_download, {}, function(s, status) {
+			// 												// 下载完成
+			// 												if (status == 200) {
+			// 													console.log("Download success: " + s.filename);
+			// 													plus.runtime.install(plus.io.convertLocalFileSystemURL(s.filename), {}, function(widgetInfo) {
+			// 														console.log(widgetInfo)
+			// 													}, function(error) {
+			// 														console.log(error)
+			// 													});
+			// 												} else {
+			// 													that.globalData.msg('下载失败');
+			// 												}
+			// 											});
+			// 											//dtask.addEventListener("statechanged", onStateChanged, false);
+			// 											dtask.start();
+			// 									}
+			// 								}
+			// 							});
+			// 						}
+			// 					}
+			// 				} else if (uni.getSystemInfoSync().platform == 'ios') {
+			//                                var ios_download = d.IOS_LINK.value;
+			// 					  var apibanben01 = d.IOS_VERSION.value;
+			// 					  var ios_updatecnt = d.IOS_DESC.value;
+			// 					  var iosIshave = d.IOS_IS_HAVE.value;
+			// 					  if (apibanben01 != banben) {
+			// 					  	if (iosIshave == "1") {
+			// 					  		uni.showModal({
+			// 					  			title: '版本更新',
+			// 					  			content: ios_updatecnt,
+			// 					  			confirmText: '立即更新',
+			// 					  			cancelText: '暂不更新',
+			// 					  			success: function(res) {
+			// 					  				if (res.confirm) {
+
+			// 					  				}
+			// 					  			}
+			// 					  		});
+			// 					  	} else {
+			// 					  		uni.showModal({
+			// 					  			title: '版本更新',
+			// 					  			content: ios_updatecnt,
+			// 					  			confirmText: '立即更新',
+			// 					  			showCancel: false,
+			// 					  			success: function(res) {
+			// 					  				if (res.confirm) {
+			// 											var dtask = plus.downloader.createDownload(ios_download, {}, function(s, status) {
+			// 												// 下载完成
+			// 												if (status == 200) {
+			// 													console.log("Download success: " + s.filename);
+			// 													plus.runtime.install(plus.io.convertLocalFileSystemURL(s.filename), {}, function(widgetInfo) {
+			// 														console.log(widgetInfo)
+			// 													}, function(error) {
+			// 														console.log(error)
+			// 													});
+			// 												} else {
+			// 													that.globalData.msg('下载失败');
+			// 												}
+			// 											});
+			// 											//dtask.addEventListener("statechanged", onStateChanged, false);
+			// 											dtask.start();
+			// 									}
+			// 					  			}
+			// 					  		});
+			// 					  	}
+			// 					  }
+
+			// 				} else {
+			// 					// that.globalData.msg('');
+			// 				}
+			// 			} else {
+			// 				that.globalData.msg(data.msg);
+			// 			}
+			// 		} else {
+			// 			var json = {
+			// 				code: -999,
+			// 				msg: '基础网络连接错误！'
+			// 			};
+			// 			that.globalData.msg(json.msg);
+			// 		}
+			// 	},
+			// 	fail: function() {
+			// 		that.globalData.msg('请检查网络连接！');
+			// 	},
+			// 	complete: function() {
+
+			// 	}
+			// });
 
 			// 获取登录授权认证服务列表，单独保存微信登录授权对象
 
@@ -129,8 +277,6 @@
 				that.globalData.msg('获取鉴权失败！');
 			});
 
-
-
 			//APP判断是否已登录
 			if (token == undefined || token == null || token == '') { //未登录
 
@@ -140,25 +286,24 @@
 
 		onShow: function() {
 			console.log('App Show')
-		},
-		onHide: function() {
-			console.log('App Hide')
-		},
+		}
 	}
 </script>
 
 <style>
+	/* <style lang="scss"> */
+
 	/*每个页面公共css */
-	.CCC{
+	.CCC {
 		color: #CCCCCC;
 	}
+
 	/* 重写标题栏 */
 	.title_bar {
 		width: 750rpx;
 		height: 88rpx;
 		background: rgba(255, 255, 255, 1);
 	}
-
 
 	/* 单行溢出 */
 	.yichu {
@@ -373,7 +518,7 @@
 		margin: 0 30rpx;
 		display: flex;
 		align-items: center;
-		border-bottom: 2rpx solid rgba(238, 238, 238, 1);
+		border-bottom: 1rpx solid #CCCCCC;
 	}
 
 	.updatetop {
@@ -402,4 +547,11 @@
 		font-weight: 400;
 		color: rgba(255, 255, 255, 1);
 	}
+
+
+
+	/* my */
+	/*
+		全局公共样式和字体图标
+	*/
 </style>
